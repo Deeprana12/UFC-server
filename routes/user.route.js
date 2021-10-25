@@ -3,46 +3,7 @@ const Member = require("../models/members.model");
 const User = require('../models/user.model')
 const nodemailer = require('nodemailer')
 require('dotenv')
-// async function sendMail(id){
-    // var em;
-    // try{        
-    //     const des = await Member.findOne({_id:id}).exec();
-    //     if(!des)
-    //         console.log('error')
-    //     else{
-    //         em = des.email
-    //     }
-    // }catch (error){
-    //     res.status(500).json(error);
-    // }
-    
-//     create transporter object with smtp server details
-//     const transporter = nodemailer.createTransport({
-//         service: 'smtp.gmail.com',
-//         port : 465,
-//         secure : true, // 465->true || else false          
-//         auth: {
-//             user: 'jonsnow150601@gmail.com',
-//             pass: 'ranajon@1506'
-//         }
-//     });
 
-//     // send email
-//     var mailOptions = {
-//         from: 'jonsnow150601@gmail.com',
-//         to: 'jonsnow150601@gmail.com',
-//         subject: 'Test Email Subject',
-//         text: 'Example HTML Message Body'        
-//     }    
-
-//     transporter.sendMail(mailOptions,function(err,info){
-//         if(err)
-//             console.log(err)
-//         else console.log('send');
-//     })
-
-    
-// }
 const sendMail = async (id) => {
 
     var em;
@@ -58,9 +19,9 @@ const sendMail = async (id) => {
     }
 
     let transporter = nodemailer.createTransport({
-        host: "smtp.gmail.com",
-        port: 465,
-        secure: true, // true for 465, false for other ports
+        host: process.env.EMAIL_HOST,
+        port: process.env.EMAIL_PORT,
+        secure: process.env.SECURITY_TYPE, 
         auth: {
           user: process.env.EMAIL_ID, // generated ethereal user
           pass: process.env.EMAIL_PASS, // generated ethereal password
@@ -68,7 +29,7 @@ const sendMail = async (id) => {
       });
     
     let info = await transporter.sendMail({
-        from: '"UFC" <jonsnow150601@.com>', // sender address
+        from: `"UFC" ${process.env.EMAIL_ID}` , // sender address
         to: em, // list of receivers
         subject: 'Confirmation for UFC membership', // Subject line
         text: 'Pay using given payment link below!!', // plain text body
