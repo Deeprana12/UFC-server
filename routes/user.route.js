@@ -43,8 +43,8 @@ const sendMail = async (id) => {
 // fetching data from the 'MEMBER' collection
 router.post("/member",async (req,res)=>{
     try{
-        const {firstname,middlename,lastname,nameofinstitute,nameofDepartment,studentIDEmployeeID,residentialAddress,city,zip,telephone,mobileno,email,dob,gender,emergencyContactPerson,relation,telephone1,mobileno1,email1,membership} = req.body;
-        const MoreuserDetails = new Member({firstname,middlename,lastname,nameofinstitute,nameofDepartment,studentIDEmployeeID,residentialAddress,city,zip,telephone,mobileno,email,dob,gender,emergencyContactPerson,relation,telephone1,mobileno1,email1,membership});
+            const {firstname,middlename,lastname,nameofinstitute,nameofDepartment,studentIDEmployeeID,residentialAddress,city,zip,telephone,mobileno,email,dob,gender,emergencyContactPerson,relation,telephone1,mobileno1,email1,membership,paymentstatus} = req.body;
+        const MoreuserDetails = new Member({firstname,middlename,lastname,nameofinstitute,nameofDepartment,studentIDEmployeeID,residentialAddress,city,zip,telephone,mobileno,email,dob,gender,emergencyContactPerson,relation,telephone1,mobileno1,email1,membership,paymentstatus});
         const tempMoreuserDetails = await MoreuserDetails.save();
         if(tempMoreuserDetails)
             res.json({msg:"done"});
@@ -64,7 +64,7 @@ router.get("/getusers",async (req,res)=>{
     }catch(e){
         res.send('error')
     }
-})
+}) 
 
 // getting user count
 router.get("/getuserscount",async (req,res)=>{
@@ -241,5 +241,33 @@ router.patch("/changeRole/:id",async (req,res)=>{
         res.status(500).json(error);
     }
 });
+
+// to update member details that his/her data is verified and change payment status to 'Done'
+router.patch("/paymentdone/:id", async (req,res) => {
+    try{
+        const des = await Member.findByIdAndUpdate({_id:req.params.id},{
+            $set:{
+                paymentstatus : "Done"
+            }
+        });
+        if(des)
+            res.send('done')
+        else res.send('error')
+    }catch (error){
+        res.status(500).json(error);
+    }
+})
+
+// members which are verified but no done payment
+router.get("/paymentnotdone", async (req,res) => {
+    try{
+        const data = await Member.find({paymentstatus : "NotDone"}).exec();        
+        if(!data)
+            res.send('error')
+        else res.send(data)
+    }catch(e){
+        res.send('error')
+    }
+})
 
 module.exports = router;
