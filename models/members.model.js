@@ -65,7 +65,10 @@ const userSchema = new mongoose.Schema({
         default:'NotVerified'
     },paymentstatus :{
         type:String,
-        default :'NotDone'
+        default :'NotVerified'
+    },pimg:{
+        type:String,
+        required:true
     }
 
 });
