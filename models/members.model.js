@@ -68,7 +68,7 @@ const userSchema = new mongoose.Schema({
         default :'NotVerified'
     },pimg:{
         type:String,
-        required:true
+        required:false
     }
 
 });

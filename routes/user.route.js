@@ -111,7 +111,7 @@ router.get("/getmemberscountpending",async (req,res)=>{
 // getting pending members full details
 router.get("/getpendingmembers",async(req,res)=>{
     try{
-        const des = await Member.find({membership:"NotVerified"}).exec();
+        const des = await Member.find({paymentstatus:"NotDone"}).exec();
         if(!des)
             res.send("Error");
         else res.send(des);
@@ -158,39 +158,70 @@ router.get("/isAdmin/:id",async (req,res)=>{
 
 // updating the member details
 router.patch("/updatemember/:id",async (req,res)=>{
-    try{        
-        const fileStr = req.body.pimg
-        const uploadedResponse = await cloudinary.uploader.upload(fileStr,{
-            upload_preset : 'dev_status'
-        })
-        console.log(uploadedResponse)
-        const des = await Member.findByIdAndUpdate({_id:req.params.id},{
-            $set:{                
-                firstname :req.body.firstname ,
-                middlename:req.body.middlename,
-                lastname:req.body.lastname,
-                nameofInstitute:req.body.nameofInstitute,
-                nameofDepartment:req.body.nameofDepartment,
-                studentIDEmployeeID:req.body.studentIDEmployeeID,
-                residentialAddress:req.body.residentialAddress,
-                city:req.body.city,
-                zip:req.body.zip,
-                telephone:req.body.telephone,
-                mobileno:req.body.mobileno,
-                email:req.body.email,
-                dob:req.body.dob,
-                gender:req.body.gender,
-                emergencyContactPerson:req.body.emergencyContactPerson,
-                relation:req.body.relation,
-                telephone1:req.body.telephone1,
-                mobileno1:req.body.mobileno1,
-                email:req.body.email11,
-                pimg:uploadedResponse.url
-            }
-        });
-        if(!des)
+    try{                
+        var fileStr = (req.body.pimg==='')        
+        // console.log(fileStr)
+        if(!fileStr){
+            const uploadedResponse = await cloudinary.uploader.upload(req.body.pimg,{
+                upload_preset : 'dev_status'
+            })
+            console.log(uploadedResponse)
+            const des = await Member.findByIdAndUpdate({_id:req.params.id},{
+                $set:{                
+                    firstname :req.body.firstname ,
+                    middlename:req.body.middlename,
+                    lastname:req.body.lastname,
+                    nameofInstitute:req.body.nameofInstitute,
+                    nameofDepartment:req.body.nameofDepartment,
+                    studentIDEmployeeID:req.body.studentIDEmployeeID,
+                    residentialAddress:req.body.residentialAddress,
+                    city:req.body.city,
+                    zip:req.body.zip,
+                    telephone:req.body.telephone,
+                    mobileno:req.body.mobileno,
+                    email:req.body.email,
+                    dob:req.body.dob,
+                    gender:req.body.gender,
+                    emergencyContactPerson:req.body.emergencyContactPerson,
+                    relation:req.body.relation,
+                    telephone1:req.body.telephone1,
+                    mobileno1:req.body.mobileno1,
+                    email:req.body.email11,
+                    pimg:uploadedResponse.url
+                }
+            });
+            if(!des)
             res.send("Error");
         else res.send(des);
+        }else{            
+            const des = await Member.findByIdAndUpdate({_id:req.params.id},{
+                $set:{                
+                    firstname :req.body.firstname ,
+                    middlename:req.body.middlename,
+                    lastname:req.body.lastname,
+                    nameofInstitute:req.body.nameofInstitute,
+                    nameofDepartment:req.body.nameofDepartment,
+                    studentIDEmployeeID:req.body.studentIDEmployeeID,
+                    residentialAddress:req.body.residentialAddress,
+                    city:req.body.city,
+                    zip:req.body.zip,
+                    telephone:req.body.telephone,
+                    mobileno:req.body.mobileno,
+                    email:req.body.email,
+                    dob:req.body.dob,
+                    gender:req.body.gender,
+                    emergencyContactPerson:req.body.emergencyContactPerson,
+                    relation:req.body.relation,
+                    telephone1:req.body.telephone1,
+                    mobileno1:req.body.mobileno1,
+                    email:req.body.email11,                    
+                }
+            });
+            if(!des)
+            res.send("Error");
+        else res.send(des);
+        }
+        
     }catch (error){
         console.log(error)
     }
@@ -227,7 +258,7 @@ router.post("/deletemember/:id",async(req,res)=>{
 // getting memberes details that are verified
 router.get("/getactivemembers",async(req,res)=>{
     try{
-        const des = await Member.find({membership:"Verified"}).exec();
+        const des = await Member.find({paymentstatus:"Done"}).exec();
         if(!des)
             res.send("Error");
         else res.send(des);
@@ -271,7 +302,7 @@ router.patch("/paymentdone/:id", async (req,res) => {
 // members which are verified but no done payment
 router.get("/paymentnotdone", async (req,res) => {
     try{
-        const data = await Member.find({paymentstatus : "NotDone"}).exec();        
+        const data = await Member.find({paymentstatus : "StillDone"}).exec();        
         if(!data)
             res.send('error')
         else res.send(data)

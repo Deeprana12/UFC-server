@@ -10,24 +10,13 @@ router.post('/login', function(req, res, next) {
         if (!user) { return res.json({msg:"false"}); }
         req.logIn(user, function(err) {
             if (err) { return send(err); }
-            return res.send({msg:"done",userData:user._id});
+            return res.send({msg:"done",userData:user._id,role:user.role,fname:user.firstname,lname:user.lastname});
         });
-    })(req, res, next);
+    })(req, res, next); 
   });
 
 // register router that will check & verify the user
-router.post('/register',[
-    body('email').trim().isEmail().withMessage('Email must be valid!!')
-    .normalizeEmail(),
-    body('password').trim().isLength(8).withMessage('Password length must be minimum 8'),
-    body('checkPass').custom((value,{req})=>{
-        if(value !== req.body.password){
-            throw new Error('Passwords do not match!!')
-        }
-        return true;
-        })
-    ],async(req,res,next)=>{   
-
+router.post('/register',async(req,res,next)=>{   
         try {
             const errors = validationResult(req);
             if(!errors.isEmpty()){
@@ -41,7 +30,7 @@ router.post('/register',[
                 res.json({err:true})
                 return;
             }
-            const user = new User({email:req.body.email,password:req.body.password})        
+            const user = new User({firstname:req.body.fname,lastname:req.body.lname,email:req.body.email,password:req.body.password})        
             await user.save()
             res.json({err:false})
         } catch (error) {
