@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const Member = require("../models/members.model");
 const User = require('../models/user.model')
+const Timetable = require('../models/timetabel.model')
 const nodemailer = require('nodemailer')
 const {cloudinary} = require('../utils/cloudinary')
 const path = require('path')
@@ -395,6 +396,88 @@ router.get("/paymentnotdone", async (req,res) => {
         else res.send(data)
     }catch(e){
         res.send('error')
+    }
+})
+
+router.patch("/updatetimetable/:id", async (req,res) => {
+    try{
+        console.log(req.body)
+        const des = await Timetable.findByIdAndUpdate({_id:req.params.id},{
+            $set:{
+                b1monbs : req.body.b1monbs,
+                b1monbe : req.body.b1monbe,
+                b1mongs : req.body.b1mongs,
+                b1monge : req.body.b1monge,
+                b2monbs : req.body.b2monbs,
+                b2monbe : req.body.b2monbe,
+                b2mongs : req.body.b2mongs,
+                b2monge : req.body.b2monge,
+                b1tuebs : req.body.b1tuebs,
+                b1tuebe : req.body.b1tuebe,
+                b1tuegs : req.body.b1tuegs,
+                b1tuege : req.body.b1tuege,
+                b2tuebs : req.body.b2tuebs,
+                b2tuebe : req.body.b2tuebe,
+                b2tuegs : req.body.b2tuegs,
+                b2tuege : req.body.b2tuege,
+                b1wedbs : req.body.b1wedbs,
+                b1wedbe : req.body.b1wedbe,
+                b1wedgs : req.body.b1wedgs,
+                b1wedge : req.body.b1wedge,
+                b2wedbs : req.body.b2wedbs,
+                b2wedbe : req.body.b2wedbe,
+                b2wedgs : req.body.b2wedgs,
+                b2wedge : req.body.b2wedge,
+                b1thurbs: req.body.b1thurbs,
+                b1thurbe: req.body.b1thurbe,
+                b1thurgs: req.body.b1thurgs,
+                b1thurge: req.body.b1thurge,
+                b2thurbs: req.body.b2thurbs,
+                b2thurbe: req.body.b2thurbe,
+                b2thurgs: req.body.b2thurgs,
+                b2thurge: req.body.b2thurge,
+                b1fribs : req.body.b1fribs,
+                b1fribe : req.body.b1fribe,
+                b1frigs : req.body.b1frigs,
+                b1frige : req.body.b1frige,
+                b2fribs : req.body.b2fribs,
+                b2fribe : req.body.b2fribe,
+                b2frigs : req.body.b2frigs,
+                b2frige : req.body.b2frige,
+                b1satbs : req.body.b1satbs,
+                b1satbe : req.body.b1satbe,
+                b1satgs : req.body.b1satgs,
+                b1satge : req.body.b1satge,
+                b2satbs : req.body.b2satbs,
+                b2satbe : req.body.b2satbe,
+                b2satgs : req.body.b2satgs,
+                b2satge : req.body.b2satge,
+                b1sunbs : req.body.b1sunbs,
+                b1sunbe : req.body.b1sunbe,
+                b1sungs : req.body.b1sungs,
+                b1sunge : req.body.b1sunge,
+                b2sunbs : req.body.b2sunbs,
+                b2sunbe : req.body.b2sunbe,
+                b2sungs : req.body.b2sungs,
+                b2sunge : req.body.b2sunge
+            }
+        })
+        if(des)
+            res.send('done')
+        else res.send('error')
+    }catch (error){
+        res.status(500).json(error);
+    }    
+})
+
+router.get("/gettimetable",async(req,res)=>{
+    try {
+        const data = await Timetable.find({}).exec();        
+        if(!data)
+            res.send('error')
+        else res.send(data)
+    } catch (e) {
+        console.log(e)
     }
 })
 
