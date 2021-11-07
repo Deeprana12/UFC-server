@@ -70,7 +70,6 @@ const userSchema = new mongoose.Schema({
         type:String,
         required:false
     }
-
 });
 
 const Member = mongoose.model('MEMBER',userSchema);

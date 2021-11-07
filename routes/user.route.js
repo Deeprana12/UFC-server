@@ -45,13 +45,78 @@ const sendMail = async (id) => {
 // fetching data from the 'MEMBER' collection
 router.post("/member",async (req,res)=>{    
     try{
-        console.log(req.file)
-        const {firstname,middlename,lastname,nameofinstitute,nameofDepartment,studentIDEmployeeID,residentialAddress,city,zip,telephone,mobileno,email,dob,gender,emergencyContactPerson,relation,telephone1,mobileno1,email1,membership,paymentstatus,pimg} = req.body;
-        const MoreuserDetails = new Member({firstname,middlename,lastname,nameofinstitute,nameofDepartment,studentIDEmployeeID,residentialAddress,city,zip,telephone,mobileno,email,dob,gender,emergencyContactPerson,relation,telephone1,mobileno1,email1,membership,paymentstatus,pimg});
-        const tempMoreuserDetails = await MoreuserDetails.save();
-        if(tempMoreuserDetails)
-            res.json({msg:"done"});
-        else res.json({error:"failed!"});
+        const id = req.body.studentIDEmployeeID
+        const doesExist = await Member.findOne({studentIDEmployeeID:id})
+        if(doesExist){            
+            res.json({err:true})            
+            return;
+        }        
+        var fileStr = (req.body.pimg==='')        
+        console.log(fileStr)
+        if(!fileStr){
+            const uploadedResponse = await cloudinary.uploader.upload(req.body.pimg,{
+                upload_preset : 'dev_status'
+            })
+            console.log(uploadedResponse)
+            const firstname =req.body.firstname 
+            const middlename=req.body.middlename
+            const lastname=req.body.lastname
+            const nameofInstitute=req.body.nameofInstitute
+            const nameofDepartment=req.body.nameofDepartment
+            const studentIDEmployeeID=req.body.studentIDEmployeeID
+            const residentialAddress=req.body.residentialAddress
+            const city=req.body.city
+            const zip=req.body.zip
+            const telephone=req.body.telephone
+            const mobileno=req.body.mobileno
+            const email=req.body.email
+            const dob=req.body.dob
+            const gender=req.body.gender
+            const emergencyContactPerson=req.body.emergencyContactPerson
+            const relation=req.body.relation
+            const telephone1=req.body.telephone1
+            const mobileno1=req.body.mobileno1
+            const email1=req.body.email1
+            const membership="Verified"
+            const paymentstatus="Done"
+            const pimg=uploadedResponse.url
+            const MoreuserDetails = new Member({firstname,middlename,lastname,nameofInstitute,nameofDepartment,studentIDEmployeeID,residentialAddress,city,zip,telephone,mobileno,email,dob,gender,emergencyContactPerson,relation,telephone1,mobileno1,email1,membership,paymentstatus,pimg});
+            const des = await MoreuserDetails.save();
+            console.log(des)
+            if(!des)
+                res.send("Error");
+            else res.send(des);
+        }else{            
+            console.log(req.body)
+            const firstname =req.body.firstname 
+            const middlename=req.body.middlename
+            const lastname=req.body.lastname
+            const nameofinstitute=req.body.nameofinstitute
+            const nameofDepartment=req.body.nameofDepartment
+            const studentIDEmployeeID=req.body.studentIDEmployeeID
+            const residentialAddress=req.body.residentialAddress
+            const city=req.body.city
+            const zip=req.body.zip
+            const telephone=req.body.telephone
+            const mobileno=req.body.mobileno
+            const email=req.body.email
+            const dob=req.body.dob
+            const gender=req.body.gender
+            const emergencyContactPerson=req.body.emergencyContactPerson
+            const relation=req.body.relation
+            const telephone1=req.body.telephone1
+            const mobileno1=req.body.mobileNo1
+            const email1=req.body.email1
+            const membership="Verified"
+            const paymentstatus="Done"
+            const pimg=""
+            const MoreuserDetails = new Member({firstname,middlename,lastname,nameofinstitute,nameofDepartment,studentIDEmployeeID,residentialAddress,city,zip,telephone,mobileno,email,dob,gender,emergencyContactPerson,relation,telephone1,mobileno1,email1,membership,paymentstatus,pimg});
+            const des = await MoreuserDetails.save().exec();
+            console.log(des)
+            if(!des)
+                res.send("Error");
+        else res.send(des);
+        }
     }catch (error){        
         res.json(error);
     } 
@@ -86,7 +151,7 @@ router.get("/getuserscount",async (req,res)=>{
 router.get("/getmemberscount",async (req,res)=>{
     try{
         const data = await Member.count();
-        console.log(data)        
+        // console.log(data)        
         if(!data)
             res.send('error')
         else res.send(String(data))
@@ -98,8 +163,8 @@ router.get("/getmemberscount",async (req,res)=>{
 // getting pending members count
 router.get("/getmemberscountpending",async (req,res)=>{
     try{
-        const data = await Member.find({membership : "NotVerified"}).count();
-        console.log(data)        
+        const data = await Member.find({paymentstatus : "StillDone"}).count();
+        // console.log(data)        
         if(!data)
             res.send('error')
         else res.send(String(data))
@@ -109,12 +174,34 @@ router.get("/getmemberscountpending",async (req,res)=>{
 })
 
 // getting pending members full details
+router.get("/verificationpending",async(req,res)=>{
+    try{
+        const des = await Member.find({paymentstatus:"NotDone"}).count();
+        if(!des)
+            res.send("Error");
+        else res.send(String(des));
+    }catch (error){
+        res.status(500).json(error);
+    } 
+})
+
 router.get("/getpendingmembers",async(req,res)=>{
     try{
         const des = await Member.find({paymentstatus:"NotDone"}).exec();
         if(!des)
             res.send("Error");
         else res.send(des);
+    }catch (error){
+        res.status(500).json(error);
+    } 
+})
+
+router.get("/paymentpending",async(req,res)=>{
+    try{
+        const des = await Member.find({paymentstatus:"StillDone"}).count();
+        if(!des)
+            res.send("Error");
+        else res.send(String(des));
     }catch (error){
         res.status(500).json(error);
     } 
@@ -165,7 +252,7 @@ router.patch("/updatemember/:id",async (req,res)=>{
             const uploadedResponse = await cloudinary.uploader.upload(req.body.pimg,{
                 upload_preset : 'dev_status'
             })
-            console.log(uploadedResponse)
+            // console.log(uploadedResponse)
             const des = await Member.findByIdAndUpdate({_id:req.params.id},{
                 $set:{                
                     firstname :req.body.firstname ,
@@ -268,7 +355,7 @@ router.get("/getactivemembers",async(req,res)=>{
 })
 
 router.patch("/changeRole/:id",async (req,res)=>{
-    console.log(req.params.id+" "+req.body.role)
+    // console.log(req.params.id+" "+req.body.role)
     try{
         const des = await User.findByIdAndUpdate({_id:req.params.id},{
             $set:{
