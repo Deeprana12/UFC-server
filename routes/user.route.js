@@ -72,6 +72,9 @@ router.post("/member",async (req,res)=>{
             const mobileno=req.body.mobileno
             const email=req.body.email
             const dob=req.body.dob
+            const state = req.body.state
+            const membertype= req.body.membertype
+            const bloodgrp = req.body.bloodgrp
             const gender=req.body.gender
             const emergencyContactPerson=req.body.emergencyContactPerson
             const relation=req.body.relation
@@ -81,7 +84,7 @@ router.post("/member",async (req,res)=>{
             const membership="Verified"
             const paymentstatus="Done"
             const pimg=uploadedResponse.url
-            const MoreuserDetails = new Member({firstname,middlename,lastname,nameofInstitute,nameofDepartment,studentIDEmployeeID,residentialAddress,city,zip,telephone,mobileno,email,dob,gender,emergencyContactPerson,relation,telephone1,mobileno1,email1,membership,paymentstatus,pimg});
+            const MoreuserDetails = new Member({firstname,middlename,lastname,nameofInstitute,nameofDepartment,studentIDEmployeeID,residentialAddress,city,zip,telephone,mobileno,email,dob,gender,emergencyContactPerson,relation,telephone1,mobileno1,email1,membership,paymentstatus,pimg,membertype,bloodgrpstate});
             const des = await MoreuserDetails.save();
             console.log(des)
             if(!des)
@@ -105,13 +108,16 @@ router.post("/member",async (req,res)=>{
             const gender=req.body.gender
             const emergencyContactPerson=req.body.emergencyContactPerson
             const relation=req.body.relation
+            const state = req.body.state
+            const membertype= req.body.membertype
+            const bloodgrp = req.body.bloodgrp
             const telephone1=req.body.telephone1
             const mobileno1=req.body.mobileNo1
             const email1=req.body.email1
             const membership="Verified"
             const paymentstatus="Done"
             const pimg=""
-            const MoreuserDetails = new Member({firstname,middlename,lastname,nameofinstitute,nameofDepartment,studentIDEmployeeID,residentialAddress,city,zip,telephone,mobileno,email,dob,gender,emergencyContactPerson,relation,telephone1,mobileno1,email1,membership,paymentstatus,pimg});
+            const MoreuserDetails = new Member({firstname,middlename,lastname,nameofinstitute,nameofDepartment,studentIDEmployeeID,residentialAddress,city,zip,telephone,mobileno,email,dob,gender,emergencyContactPerson,relation,telephone1,mobileno1,email1,membership,paymentstatus,pimg,membertype,bloodgrp,state});
             const des = await MoreuserDetails.save().exec();
             console.log(des)
             if(!des)
@@ -275,6 +281,9 @@ router.patch("/updatemember/:id",async (req,res)=>{
                     telephone1:req.body.telephone1,
                     mobileno1:req.body.mobileno1,
                     email:req.body.email11,
+                    state : req.body.state,
+                    membertype : req.body.membertype,
+                    bloodgrp : req.body.bloodgrp,
                     pimg:uploadedResponse.url
                 }
             });
@@ -302,7 +311,10 @@ router.patch("/updatemember/:id",async (req,res)=>{
                     relation:req.body.relation,
                     telephone1:req.body.telephone1,
                     mobileno1:req.body.mobileno1,
-                    email:req.body.email11,                    
+                    email:req.body.email11, 
+                    state : req.body.state,
+                    membertype : req.body.membertype,
+                    bloodgrp : req.body.bloodgrp                   
                 }
             });
             if(!des)

@@ -27,8 +27,17 @@ const userSchema = new mongoose.Schema({
     },city:{
         type:String,
         required:true
+    },state:{
+        type:String,
+        required:true
     },zip:{
         type:Number,
+        required:true
+    },bloodgrp:{
+        type:String,
+        required:true
+    },membertype:{
+        type:String,
         required:true
     },telephone:{
         type:Number,
