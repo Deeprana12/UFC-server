@@ -1,11 +1,13 @@
 const router = require("express").Router();
 const Member = require("../models/members.model");
 const User = require('../models/user.model')
+const Currentbatch = require('../models/currentbatch.model')
 const Timetable = require('../models/timetabel.model')
 const nodemailer = require('nodemailer')
 const {cloudinary} = require('../utils/cloudinary')
 const path = require('path')
 require('dotenv')
+
 
 const sendMail = async (id) => {
 
@@ -46,13 +48,15 @@ const sendMail = async (id) => {
 // fetching data from the 'MEMBER' collection
 router.post("/member",async (req,res)=>{    
     try{
+        console.log(req.body)
         const id = req.body.studentIDEmployeeID
         const doesExist = await Member.findOne({studentIDEmployeeID:id})
-        if(doesExist){            
-            res.json({err:true})            
+        console.log(doesExist!=null)
+        if(doesExist!=null){            
+            res.send('error')
             return;
         }        
-        var fileStr = (req.body.pimg==='')        
+        var fileStr = (req.body.pimg==='')
         console.log(fileStr)
         if(!fileStr){
             const uploadedResponse = await cloudinary.uploader.upload(req.body.pimg,{
@@ -62,7 +66,7 @@ router.post("/member",async (req,res)=>{
             const firstname =req.body.firstname 
             const middlename=req.body.middlename
             const lastname=req.body.lastname
-            const nameofInstitute=req.body.nameofInstitute
+            const nameofinstitute=req.body.nameofinstitute
             const nameofDepartment=req.body.nameofDepartment
             const studentIDEmployeeID=req.body.studentIDEmployeeID
             const residentialAddress=req.body.residentialAddress
@@ -73,7 +77,7 @@ router.post("/member",async (req,res)=>{
             const email=req.body.email
             const dob=req.body.dob
             const state = req.body.state
-            const membertype= req.body.membertype
+            const membertype= req.body.memberType
             const bloodgrp = req.body.bloodgrp
             const gender=req.body.gender
             const emergencyContactPerson=req.body.emergencyContactPerson
@@ -84,14 +88,13 @@ router.post("/member",async (req,res)=>{
             const membership="Verified"
             const paymentstatus="Done"
             const pimg=uploadedResponse.url
-            const MoreuserDetails = new Member({firstname,middlename,lastname,nameofInstitute,nameofDepartment,studentIDEmployeeID,residentialAddress,city,zip,telephone,mobileno,email,dob,gender,emergencyContactPerson,relation,telephone1,mobileno1,email1,membership,paymentstatus,pimg,membertype,bloodgrpstate});
+            const MoreuserDetails = new Member({firstname,middlename,lastname,nameofinstitute,nameofDepartment,studentIDEmployeeID,residentialAddress,city,zip,telephone,mobileno,email,dob,gender:"male",emergencyContactPerson,relation,telephone1,mobileno1,email1,membership,paymentstatus,pimg,membertype,bloodgrp,state});
             const des = await MoreuserDetails.save();
             console.log(des)
             if(!des)
                 res.send("Error");
-            else res.send(des);
+            else res.send('Done');
         }else{            
-            console.log(req.body)
             const firstname =req.body.firstname 
             const middlename=req.body.middlename
             const lastname=req.body.lastname
@@ -109,10 +112,10 @@ router.post("/member",async (req,res)=>{
             const emergencyContactPerson=req.body.emergencyContactPerson
             const relation=req.body.relation
             const state = req.body.state
-            const membertype= req.body.membertype
+            const membertype= req.body.memberType
             const bloodgrp = req.body.bloodgrp
             const telephone1=req.body.telephone1
-            const mobileno1=req.body.mobileNo1
+            const mobileno1=req.body.mobileno1
             const email1=req.body.email1
             const membership="Verified"
             const paymentstatus="Done"
@@ -122,7 +125,7 @@ router.post("/member",async (req,res)=>{
             console.log(des)
             if(!des)
                 res.send("Error");
-        else res.send(des);
+            else res.send('Done');
         }
     }catch (error){        
         res.json(error);
