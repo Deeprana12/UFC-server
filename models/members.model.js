@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-
+const currentDate = new Date().datetime.toISOString().slice(0,10);
 // Member schema
 const userSchema = new mongoose.Schema({
     firstname:{
@@ -78,6 +78,9 @@ const userSchema = new mongoose.Schema({
     },pimg:{
         type:String,
         required:false
+    },paymentdate:{
+        type:String ,
+        default:currentDate
     }
 });
 

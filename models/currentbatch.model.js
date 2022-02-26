@@ -10,7 +10,7 @@ const currentbatch = new mongoose.Schema({
         type:String,
         required:true
     },punch:{
-        type:Time,
+        type:String,
         required:true
     },dateduration:{
         type:Date,
