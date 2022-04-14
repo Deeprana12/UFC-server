@@ -1,8 +1,7 @@
 const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
 
 // Member schema
-const currentbatch = new mongoose.Schema({
+const b1regular = new mongoose.Schema({
     id:{
         type:String,
         required:true
@@ -18,8 +17,8 @@ const currentbatch = new mongoose.Schema({
     }
 });
 
-const Currentbatch = mongoose.model('CURRENTBATCH',currentbatch);
-module.exports = Currentbatch;
+const B1regular = mongoose.model('B1REGULAR',b1regular);
+module.exports = B1regular;
 
 // id
 // time

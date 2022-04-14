@@ -2,6 +2,11 @@ const router = require("express").Router();
 const Member = require("../models/members.model");
 const User = require('../models/user.model')
 const Currentbatch = require('../models/currentbatch.model')
+const Currentbatch2 = require('../models/currentbatch2.model')
+const B1regular = require('../models/b1regular.model')
+const B1diff = require('../models/b1diff.model')
+const B2regular = require('../models/b2regular.model')
+const B2diff = require('../models/b2diff.model')
 const Timetable = require('../models/timetabel.model')
 const nodemailer = require('nodemailer')
 const {cloudinary} = require('../utils/cloudinary')
@@ -12,7 +17,7 @@ require('dotenv')
 const sendMail = async (id) => {
 
     var em;
-    try{        
+    try{
         const des = await Member.findOne({_id:id}).exec();
         if(!des)
             console.log('error')
@@ -48,7 +53,7 @@ const sendMail = async (id) => {
 // fetching data from the 'MEMBER' collection
 router.post("/member",async (req,res)=>{    
     try{
-        console.log(req.body)
+        // console.log(req.body)
         const id = req.body.studentIDEmployeeID
         const doesExist = await Member.findOne({studentIDEmployeeID:id})
         console.log(doesExist!=null)
@@ -77,7 +82,7 @@ router.post("/member",async (req,res)=>{
             const email=req.body.email
             const dob=req.body.dob
             const state = req.body.state
-            const membertype= req.body.memberType
+            const designation= req.body.designation
             const bloodgrp = req.body.bloodgrp
             const gender=req.body.gender
             const emergencyContactPerson=req.body.emergencyContactPerson
@@ -88,7 +93,7 @@ router.post("/member",async (req,res)=>{
             const membership="Verified"
             const paymentstatus="Done"
             const pimg=uploadedResponse.url
-            const MoreuserDetails = new Member({firstname,middlename,lastname,nameofinstitute,nameofDepartment,studentIDEmployeeID,residentialAddress,city,zip,telephone,mobileno,email,dob,gender:"male",emergencyContactPerson,relation,telephone1,mobileno1,email1,membership,paymentstatus,pimg,membertype,bloodgrp,state});
+            const MoreuserDetails = new Member({firstname,middlename,lastname,nameofinstitute,nameofDepartment,studentIDEmployeeID,residentialAddress,city,zip,telephone,mobileno,email,dob,gender:"male",emergencyContactPerson,relation,telephone1,mobileno1,email1,membership,paymentstatus,pimg,designation,bloodgrp,state});
             const des = await MoreuserDetails.save();
             console.log(des)
             if(!des)
@@ -112,7 +117,7 @@ router.post("/member",async (req,res)=>{
             const emergencyContactPerson=req.body.emergencyContactPerson
             const relation=req.body.relation
             const state = req.body.state
-            const membertype= req.body.memberType
+            const designation= req.body.designation
             const bloodgrp = req.body.bloodgrp
             const telephone1=req.body.telephone1
             const mobileno1=req.body.mobileno1
@@ -120,7 +125,7 @@ router.post("/member",async (req,res)=>{
             const membership="Verified"
             const paymentstatus="Done"
             const pimg=""
-            const MoreuserDetails = new Member({firstname,middlename,lastname,nameofinstitute,nameofDepartment,studentIDEmployeeID,residentialAddress,city,zip,telephone,mobileno,email,dob,gender,emergencyContactPerson,relation,telephone1,mobileno1,email1,membership,paymentstatus,pimg,membertype,bloodgrp,state});
+            const MoreuserDetails = new Member({firstname,middlename,lastname,nameofinstitute,nameofDepartment,studentIDEmployeeID,residentialAddress,city,zip,telephone,mobileno,email,dob,gender,emergencyContactPerson,relation,telephone1,mobileno1,email1,membership,paymentstatus,pimg,designation,bloodgrp,state});
             const des = await MoreuserDetails.save().exec();
             console.log(des)
             if(!des)
@@ -258,6 +263,10 @@ router.patch("/updatemember/:id",async (req,res)=>{
     try{                
         var fileStr = (req.body.pimg==='')        
         // console.log(fileStr)
+        const cuDate = new Date();        
+        const currDate = cuDate.setDate(cuDate.getDate() + 7);
+        const curreDate = new Date(currDate);
+        const currentDate = curreDate.toISOString().slice(0,10);
         if(!fileStr){
             const uploadedResponse = await cloudinary.uploader.upload(req.body.pimg,{
                 upload_preset : 'dev_status'
@@ -285,7 +294,7 @@ router.patch("/updatemember/:id",async (req,res)=>{
                     mobileno1:req.body.mobileno1,
                     email:req.body.email11,
                     state : req.body.state,
-                    membertype : req.body.membertype,
+                    designation : req.body.designation,
                     bloodgrp : req.body.bloodgrp,
                     pimg:uploadedResponse.url
                 }
@@ -316,8 +325,9 @@ router.patch("/updatemember/:id",async (req,res)=>{
                     mobileno1:req.body.mobileno1,
                     email:req.body.email11, 
                     state : req.body.state,
-                    membertype : req.body.membertype,
-                    bloodgrp : req.body.bloodgrp                   
+                    designation : req.body.designation,
+                    bloodgrp : req.body.bloodgrp,  
+                    dueDate:currentDate                              
                 }
             });
             if(!des)
@@ -495,5 +505,259 @@ router.get("/gettimetable",async(req,res)=>{
         console.log(e)
     }
 })
+
+router.get("/getduemembers",async(req,res)=>{
+    try {
+        const cuDate = new Date();        
+        const currDate = cuDate.setDate(cuDate.getDate() + 7);
+        const curreDate = new Date(currDate);
+        const currentDate = curreDate.toISOString().slice(0,10);
+        const data = await Member.find({dueDate : {$lte : `${currentDate}`}});
+        if(!data)
+            res.send('error')
+        else res.send(data)
+    } catch (e) {
+        console.log(e)
+    }
+})
+
+router.patch("/renewpayment",async(req,res)=>{
+    try {
+        const cDate = req.body.currentduedate;        
+        const cuDate = new Date(cDate);                
+        const currDate = cuDate.setDate(cuDate.getDate() + 30);
+        const curreDate = new Date(currDate);
+        const currentDate = curreDate.toISOString().slice(0,10);
+        let data = req.body;        
+        const des = await Member.findByIdAndUpdate({_id:data.id},{
+            $set:{
+                dueDate : currentDate
+            }
+        });
+        if(des)
+            res.send('done')
+        else res.send('error')       
+    } catch (e) {
+        console.log(e)
+    }
+})
+
+router.post("/removemember/:id",async(req,res)=>{
+    try {                        
+        const des = await Member.findByIdAndDelete({_id:req.params.id}).exec();
+        if(des)
+            res.send('done')
+        else res.send('error')
+    } catch (e) {
+        console.log(e)
+    }
+})
+
+router.get("/getcurrentbatch",async(req,res)=>{
+    try {                        
+        const des = await Currentbatch.find({}).exec();
+        if(!des)
+            res.send('error')
+        else res.send(des)
+    } catch (e) {
+        console.log(e)
+    }
+})
+
+router.get("/getdiffBatch",async(req,res)=>{
+    try {                        
+        const des = await B1diff.find({}).exec();
+        if(!des)
+            res.send('error')
+        else res.send(des)
+    } catch (e) {
+        console.log(e)
+    }
+})
+
+router.get("/getregular",async(req,res)=>{
+    try {                        
+        const des = await B1regular.find({}).exec();
+        if(!des)
+            res.send('error')
+        else res.send(des)
+    } catch (e) {
+        console.log(e)
+    }
+})
+
+router.post("/batch1",async(req,res)=>{
+    try {           
+        // console.log(req.body);
+        const final_data = JSON.parse(req.body.data);
+        // console.log(final_data);
+        const id=final_data.id;
+        const title=final_data.title;          
+        const completed = final_data.completed;
+        const userId = final_data.userId;
+        const newDetails = new Currentbatch({id,title,completed,userId});
+        const des = await newDetails.save();        
+        if(des)
+            res.send(des)
+        else res.send('error')
+    } catch (e) {
+        console.log(e)
+    }
+})
+
+router.post("/savetoregular",async(req,res)=>{
+    try {           
+        const final_data = JSON.parse(req.body.data);
+        const id=final_data._id;
+        const title=final_data.title;          
+        const completed = final_data.completed;
+        const userId = final_data.userId;
+        const newDetails = new B1regular({id,title,completed,userId});
+        const deleteData = await Currentbatch.findByIdAndDelete(id).exec()
+        const des = await newDetails.save();        
+        if(des && deleteData)
+            res.send(des)
+        else res.send('error')
+    } catch (e) {
+        console.log(e)
+    }
+})
+
+router.post("/savetodiff",async(req,res)=>{
+    try {           
+        const final_data = JSON.parse(req.body.data);
+        const id=final_data._id;
+        const title=final_data.title;          
+        const completed = final_data.completed;
+        const userId = final_data.userId;
+        const newDetails = new B1diff({id,title,completed,userId});
+        const deleteData = await Currentbatch.findByIdAndDelete(id).exec()
+        const des = await newDetails.save();        
+        if(des && deleteData)
+            res.send(des)
+        else res.send('error')
+    } catch (e) {
+        console.log(e)
+    }
+})
+
+router.post("/deletethis",async(req,res)=>{
+    try {
+        const id = req.body.id;
+        console.log(id);
+        const deleteData = await Currentbatch.findByIdAndDelete(id).exec();
+        if(deleteData)
+            res.send('done');
+        else res.send('error');
+    } catch (e) {
+        console.log(e)
+        res.json({error:e})
+    }
+})
+
+// For branch 2 
+
+router.get("/b2/getcurrentbatch",async(req,res)=>{
+    try {                        
+        const des = await Currentbatch2.find({}).exec();
+        if(!des)
+            res.send('error')
+        else res.send(des)
+    } catch (e) {
+        console.log(e)
+    }
+})
+
+router.get("/b2/getdiffBatch",async(req,res)=>{
+    try {                        
+        const des = await B2diff.find({}).exec();
+        if(!des)
+            res.send('error')
+        else res.send(des)
+    } catch (e) {
+        console.log(e)
+    }
+})
+
+router.get("/b2/getregular",async(req,res)=>{
+    try {                        
+        const des = await B2regular.find({}).exec();
+        if(!des)
+            res.send('error')
+        else res.send(des)
+    } catch (e) {
+        console.log(e)
+    }
+})
+
+router.post("/b2/batch1",async(req,res)=>{
+    try {           
+        // console.log(req.body);
+        const final_data = JSON.parse(req.body.data);
+        // console.log(final_data);
+        const id=final_data.id;
+        const title=final_data.title;          
+        const completed = final_data.completed;
+        const userId = final_data.userId;
+        const newDetails = new Currentbatch2({id,title,completed,userId});
+        const des = await newDetails.save();        
+        if(des)
+            res.send(des)
+        else res.send('error')
+    } catch (e) {
+        console.log(e)
+    }
+})
+
+router.post("/b2/savetoregular",async(req,res)=>{
+    try {           
+        const final_data = JSON.parse(req.body.data);
+        const id=final_data._id;
+        const title=final_data.title;          
+        const completed = final_data.completed;
+        const userId = final_data.userId;
+        const newDetails = new B2regular({id,title,completed,userId});
+        const deleteData = await Currentbatch2.findByIdAndDelete(id).exec()
+        const des = await newDetails.save();        
+        if(des && deleteData)
+            res.send(des)
+        else res.send('error')
+    } catch (e) {
+        console.log(e)
+    }
+})
+
+router.post("/b2/savetodiff",async(req,res)=>{
+    try {           
+        const final_data = JSON.parse(req.body.data);
+        const id=final_data._id;
+        const title=final_data.title;          
+        const completed = final_data.completed;
+        const userId = final_data.userId;
+        const newDetails = new B2diff({id,title,completed,userId});
+        const deleteData = await Currentbatch2.findByIdAndDelete(id).exec()
+        const des = await newDetails.save();        
+        if(des && deleteData)
+            res.send(des)
+        else res.send('error')
+    } catch (e) {
+        console.log(e)
+    }
+})
+
+router.post("/b2/deletethis",async(req,res)=>{
+    try {
+        const id = req.body.id;
+        console.log(id);
+        const deleteData = await Currentbatch2.findByIdAndDelete(id).exec();
+        if(deleteData)
+            res.send('done');
+        else res.send('error');
+    } catch (e) {
+        console.log(e)
+        res.json({error:e})
+    }
+})
+
 
 module.exports = router;

@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const currentDate = new Date().datetime.toISOString().slice(0,10);
+// const currentDate = new Date().toISOString().slice(0,10);
+// const dueDate = new Date().setDate(someDate.getDate() + 30);
+// const one_day = 1000 * 60 * 60 * 24;
 // Member schema
 const userSchema = new mongoose.Schema({
     firstname:{
@@ -78,9 +80,10 @@ const userSchema = new mongoose.Schema({
     },pimg:{
         type:String,
         required:false
-    },paymentdate:{
-        type:String ,
-        default:currentDate
+    },
+    dueDate : {
+        type : String,
+        required:false        
     }
 });
 

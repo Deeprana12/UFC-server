@@ -1,8 +1,7 @@
 const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
 
 // Member schema
-const currentbatch = new mongoose.Schema({
+const b2diff = new mongoose.Schema({
     id:{
         type:String,
         required:true
@@ -18,8 +17,8 @@ const currentbatch = new mongoose.Schema({
     }
 });
 
-const Currentbatch = mongoose.model('CURRENTBATCH',currentbatch);
-module.exports = Currentbatch;
+const B2diff = mongoose.model('B2DIFF',b2diff);
+module.exports = B2diff;
 
 // id
 // time
